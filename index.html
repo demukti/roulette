@@ -169,6 +169,27 @@
       getReady();
     });
 
+    const isEditableTarget = (target) => {
+      if (!target) return false;
+      const tag = target.tagName;
+      return target.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.repeat) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      if (isEditableTarget(e.target)) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'g') {
+        e.preventDefault();
+        document.querySelector('#btnStart').click();
+      } else if (key === 's') {
+        e.preventDefault();
+        document.querySelector('#btnShuffle').click();
+      }
+    });
+
     document.querySelector('#btnStart').addEventListener('click', () => {
       if (!ready) return;
       gtag && gtag('event', 'start', {
