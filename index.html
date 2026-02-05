@@ -189,13 +189,33 @@
     const slowMoMinInput = document.querySelector('#rngSlowMoMin');
     const slowMoMinValue = document.querySelector('#slowMoMinValue');
     const slowMoControls = document.querySelector('.slowmo-controls');
+    const settingsKey = 'mbr_settings';
     const formatSlowMoValue = (value) => `${value.toFixed(2)}x`;
+    const saveSettings = () => {
+      localStorage.setItem(settingsKey, JSON.stringify({
+        useSkills: window.options.useSkills,
+        slowMoEnabled: window.options.slowMoEnabled,
+        slowMoMinScale: window.options.slowMoMinScale,
+      }));
+    };
+    const loadSettings = () => {
+      const raw = localStorage.getItem(settingsKey);
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (typeof parsed.useSkills === 'boolean') window.options.useSkills = parsed.useSkills;
+        if (typeof parsed.slowMoEnabled === 'boolean') window.options.slowMoEnabled = parsed.slowMoEnabled;
+        if (typeof parsed.slowMoMinScale === 'number') window.options.slowMoMinScale = parsed.slowMoMinScale;
+      } catch (e) {
+      }
+    };
     const setSlowMoEnabled = (enabled) => {
       window.options.slowMoEnabled = enabled;
       if (slowMoToggle) slowMoToggle.checked = enabled;
       if (slowMoMinInput) slowMoMinInput.disabled = !enabled;
       if (slowMoControls) slowMoControls.classList.toggle('disabled', !enabled);
       window.roulette.setSlowMoEnabled(enabled);
+      saveSettings();
     };
     const setSlowMoMinScale = (value) => {
       if (Number.isNaN(value)) return;
@@ -204,6 +224,7 @@
       if (slowMoMinInput) slowMoMinInput.value = String(clamped);
       if (slowMoMinValue) slowMoMinValue.textContent = formatSlowMoValue(clamped);
       window.roulette.setSlowMoMinScale(clamped);
+      saveSettings();
     };
     const toggleSlowMo = () => {
       setSlowMoEnabled(!window.options.slowMoEnabled);
@@ -276,6 +297,7 @@
     document.querySelector('#chkSkill').addEventListener('change', (e) => {
       window.options.useSkills = e.target.matches(':checked');
       window.roulette.setWinningRank(window.options.winningRank);
+      saveSettings();
     });
 
     document.querySelector('#chkDarkMode').addEventListener('change', (e) => {
@@ -290,6 +312,8 @@
       setWinnerRank(isNaN(v) ? 0 : v);
     });
 
+    loadSettings();
+    document.querySelector('#chkSkill').checked = window.options.useSkills;
     setSlowMoEnabled(window.options.slowMoEnabled);
     setSlowMoMinScale(window.options.slowMoMinScale);
 
@@ -409,7 +433,7 @@
         <i class="icon play"></i>
         <span data-trans>Slow motion</span>
       </label>
-      <input type="checkbox" id="chkSlowMo" checked />
+      <input type="checkbox" id="chkSlowMo" />
       <div class="slowmo-controls">
         <input type="range" id="rngSlowMoMin" min="0.2" max="1" step="0.05" value="0.2" />
         <span id="slowMoMinValue" class="slowmo-value">0.20x</span>
@@ -431,7 +455,7 @@
         <i class="icon bomb"></i>
         <span data-trans>Using skills</span>
       </label>
-      <input type="checkbox" id="chkSkill" checked />
+      <input type="checkbox" id="chkSkill" />
       <div class='theme'>
         <i class='icon sun'></i>
         <input type='checkbox' id='chkDarkMode' checked />

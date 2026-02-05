@@ -1,9 +1,9 @@
 class Options {
-  useSkills: boolean = true;
+  useSkills: boolean = false;
   winningRank: number = 0;
   autoRecording: boolean = true;
   darkMode: boolean = true;
-  slowMoEnabled: boolean = true;
+  slowMoEnabled: boolean = false;
   slowMoMinScale: number = 0.2;
 }
 
