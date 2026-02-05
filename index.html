@@ -175,6 +175,17 @@
       return target.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
     };
 
+    const settingsPanel = document.querySelector('#settings');
+    const donatePanel = document.querySelector('#donate');
+    const setMenuVisible = (visible) => {
+      if (settingsPanel) settingsPanel.classList.toggle('hide', !visible);
+      if (donatePanel) donatePanel.classList.toggle('hide', !visible);
+    };
+    const toggleMenu = () => {
+      if (!settingsPanel) return;
+      setMenuVisible(settingsPanel.classList.contains('hide'));
+    };
+
     document.addEventListener('keydown', (e) => {
       if (e.repeat) return;
       if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -190,6 +201,9 @@
       } else if (key === 'f') {
         e.preventDefault();
         window.roulette.setFastForward(true, false);
+      } else if (key === 'm') {
+        e.preventDefault();
+        toggleMenu();
       }
     });
 
@@ -212,8 +226,7 @@
         'value': window.roulette.getCount(),
       });
       window.roulette.start();
-      document.querySelector('#settings').classList.add('hide');
-      document.querySelector('#donate').classList.add('hide');
+      setMenuVisible(false);
     });
 
     document.querySelector('#chkAutoRecording').addEventListener('change', (e) => {
@@ -250,10 +263,6 @@
 
     window.roulette.addEventListener('goal', () => {
       ready = false;
-      setTimeout(() => {
-        document.querySelector('#settings').classList.remove('hide');
-        document.querySelector('#donate').classList.remove('hide');
-      }, 3000);
     });
 
     window.roulette.addEventListener('message', (e) => {
