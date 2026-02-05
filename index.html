@@ -185,6 +185,29 @@
       if (!settingsPanel) return;
       setMenuVisible(settingsPanel.classList.contains('hide'));
     };
+    const slowMoToggle = document.querySelector('#chkSlowMo');
+    const slowMoMinInput = document.querySelector('#rngSlowMoMin');
+    const slowMoMinValue = document.querySelector('#slowMoMinValue');
+    const slowMoControls = document.querySelector('.slowmo-controls');
+    const formatSlowMoValue = (value) => `${value.toFixed(2)}x`;
+    const setSlowMoEnabled = (enabled) => {
+      window.options.slowMoEnabled = enabled;
+      if (slowMoToggle) slowMoToggle.checked = enabled;
+      if (slowMoMinInput) slowMoMinInput.disabled = !enabled;
+      if (slowMoControls) slowMoControls.classList.toggle('disabled', !enabled);
+      window.roulette.setSlowMoEnabled(enabled);
+    };
+    const setSlowMoMinScale = (value) => {
+      if (Number.isNaN(value)) return;
+      const clamped = Math.min(Math.max(value, 0.2), 1);
+      window.options.slowMoMinScale = clamped;
+      if (slowMoMinInput) slowMoMinInput.value = String(clamped);
+      if (slowMoMinValue) slowMoMinValue.textContent = formatSlowMoValue(clamped);
+      window.roulette.setSlowMoMinScale(clamped);
+    };
+    const toggleSlowMo = () => {
+      setSlowMoEnabled(!window.options.slowMoEnabled);
+    };
 
     document.addEventListener('keydown', (e) => {
       if (e.repeat) return;
@@ -192,7 +215,8 @@
       if (isEditableTarget(e.target)) return;
 
       const key = e.key.toLowerCase();
-      if (key === 'g') {
+      const isSpace = e.code === 'Space' || e.key === ' ';
+      if (isSpace) {
         e.preventDefault();
         document.querySelector('#btnStart').click();
       } else if (key === 's') {
@@ -201,6 +225,9 @@
       } else if (key === 'f') {
         e.preventDefault();
         window.roulette.setFastForward(true, false);
+      } else if (key === 'l') {
+        e.preventDefault();
+        toggleSlowMo();
       } else if (key === 'm') {
         e.preventDefault();
         toggleMenu();
@@ -234,6 +261,18 @@
       window.roulette.setAutoRecording(window.options.autoRecording);
     });
 
+    if (slowMoToggle) {
+      slowMoToggle.addEventListener('change', (e) => {
+        setSlowMoEnabled(e.target.matches(':checked'));
+      });
+    }
+    if (slowMoMinInput) {
+      slowMoMinInput.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value);
+        setSlowMoMinScale(value);
+      });
+    }
+
     document.querySelector('#chkSkill').addEventListener('change', (e) => {
       window.options.useSkills = e.target.matches(':checked');
       window.roulette.setWinningRank(window.options.winningRank);
@@ -250,6 +289,9 @@
       winnerType = 'custom';
       setWinnerRank(isNaN(v) ? 0 : v);
     });
+
+    setSlowMoEnabled(window.options.slowMoEnabled);
+    setSlowMoMinScale(window.options.slowMoMinScale);
 
     document.querySelector('.btn-last-winner').addEventListener('click', () => {
       const total = window.roulette.getCount();
@@ -362,6 +404,17 @@
       </label>
       <input type="checkbox" id="chkAutoRecording" />
     </div>
+    <div class="row slowmo">
+      <label for='chkSlowMo'>
+        <i class="icon play"></i>
+        <span data-trans>Slow motion</span>
+      </label>
+      <input type="checkbox" id="chkSlowMo" checked />
+      <div class="slowmo-controls">
+        <input type="range" id="rngSlowMoMin" min="0.2" max="1" step="0.05" value="0.2" />
+        <span id="slowMoMinValue" class="slowmo-value">0.20x</span>
+      </div>
+    </div>
     <div class="row">
       <label>
         <i class="icon trophy"></i>
@@ -422,7 +475,7 @@
     <button id="closeNotice" data-trans>Close</button>
   </div>
 </div>
-<div class="copyright">&copy; 2022-2026.<a href="https://lazygyu.net" target="_blank">lazygyu</a> <span data-trans>This program is freeware and may be used freely anywhere, including in broadcasts and videos.</span>
-</div>
+<!-- <div class="copyright">&copy; 2022-2026.<a href="https://lazygyu.net" target="_blank">lazygyu</a> <span data-trans>This program is freeware and may be used freely anywhere, including in broadcasts and videos.</span>
+</div> -->
 </body>
 </html>

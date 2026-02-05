@@ -28,6 +28,8 @@ export class Roulette extends EventTarget {
   private _updateInterval = 10;
   private _timeScale = 1;
   private _speed = 1;
+  private _slowMoEnabled = true;
+  private _slowMoMinScale = 0.2;
 
   private _winners: Marble[] = [];
   private _particleManager = new ParticleManager();
@@ -190,6 +192,7 @@ export class Roulette extends EventTarget {
   }
 
   private _calcTimeScale(): number {
+    if (!this._slowMoEnabled) return 1;
     if (!this._stage) return 1;
     const targetIndex = this._winnerRank - this._winners.length;
     if (
@@ -201,7 +204,7 @@ export class Roulette extends EventTarget {
         this._stage.zoomY - zoomThreshold * 1.2 &&
         (this._marbles[targetIndex - 1] || this._marbles[targetIndex + 1])
       ) {
-        return Math.max(0.2, this._goalDist / zoomThreshold);
+        return Math.max(this._slowMoMinScale, this._goalDist / zoomThreshold);
       }
     }
     return 1;
@@ -331,6 +334,16 @@ export class Roulette extends EventTarget {
       throw new Error('Speed multiplier must larger than 0');
     }
     this._speed = value;
+  }
+
+  public setSlowMoEnabled(enabled: boolean) {
+    this._slowMoEnabled = enabled;
+  }
+
+  public setSlowMoMinScale(value: number) {
+    if (!Number.isFinite(value)) return;
+    const clamped = Math.min(Math.max(value, 0.2), 1);
+    this._slowMoMinScale = clamped;
   }
 
   public setFastForward(enabled: boolean, showOverlay: boolean = true) {
