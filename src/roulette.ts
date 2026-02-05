@@ -333,6 +333,10 @@ export class Roulette extends EventTarget {
     this._speed = value;
   }
 
+  public setFastForward(enabled: boolean, showOverlay: boolean = true) {
+    this.fastForwarder.setEnabled(enabled, showOverlay);
+  }
+
   public setTheme(themeName: keyof typeof Themes) {
     this._theme = Themes[themeName];
   }

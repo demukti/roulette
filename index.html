@@ -187,6 +187,20 @@
       } else if (key === 's') {
         e.preventDefault();
         document.querySelector('#btnShuffle').click();
+      } else if (key === 'f') {
+        e.preventDefault();
+        window.roulette.setFastForward(true, false);
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      if (isEditableTarget(e.target)) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'f') {
+        e.preventDefault();
+        window.roulette.setFastForward(false, false);
       }
     });
 

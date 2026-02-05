@@ -10,6 +10,7 @@ export class FastForwader implements UIObject {
     h: 0,
   };
   private icon: HTMLImageElement;
+  private showOverlay: boolean = true;
 
   constructor() {
     this.icon = new Image();
@@ -21,6 +22,11 @@ export class FastForwader implements UIObject {
 
   public get speed(): number {
     return this.isEnabled ? 2 : 1;
+  }
+
+  public setEnabled(enabled: boolean, showOverlay: boolean = true): void {
+    this.isEnabled = enabled;
+    this.showOverlay = showOverlay;
   }
 
   update(deltaTime: number): void {
@@ -35,7 +41,7 @@ export class FastForwader implements UIObject {
     const centerX = this.bound.x + this.bound.w / 2;
     const centerY = this.bound.y + this.bound.h / 2;
 
-    if (this.isEnabled) {
+    if (this.isEnabled && this.showOverlay) {
       ctx.save();
       ctx.strokeStyle = 'white';
       ctx.globalAlpha = 0.5;
@@ -50,10 +56,10 @@ export class FastForwader implements UIObject {
   }
 
   onMouseDown?(e?: MouseEventArgs): void {
-    this.isEnabled = true;
+    this.setEnabled(true, true);
   }
 
   onMouseUp?(e?: MouseEventArgs): void {
-    this.isEnabled = false;
+    this.setEnabled(false, true);
   }
 }
